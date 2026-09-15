@@ -10,9 +10,9 @@
 
 
 namespace EnvironmentalForces {
-    void applyGravity(std::vector<Particle *> &particles);
+    void applyGravity(std::vector<Particle> &particles);
 
-    void applyDrag(std::vector<Particle *> &particles);
+    void applyDrag(std::vector<Particle> &particles);
 };
 
 

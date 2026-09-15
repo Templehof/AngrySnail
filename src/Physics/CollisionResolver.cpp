@@ -3,25 +3,20 @@
 //
 
 #include "CollisionResolver.h"
-
 #include <algorithm>
-
 #include "Force.h"
 
-#include <algorithm> // for std::max and std::min
+void CollisionResolver::ResolveKineticCollision(Particle &a, Particle &b) {
+    float maInverse = a.invMass;
+    float mbInverse = b.invMass;
 
-void CollisionResolver::ResolveKineticCollision(Particle *a, Particle *b) {
-    float maInverse = a->invMass;
-    float mbInverse = b->invMass;
+    Vec2 velA = a.velocity;
+    Vec2 velB = b.velocity;
 
-    Vec2 velA = a->velocity;
-    Vec2 velB = b->velocity;
+    Vec2 posA = a.position;
+    Vec2 posB = b.position;
 
-    Vec2 posA = a->position;
-    Vec2 posB = b->position;
-
-    const float restitutionCoefficient = 0.2f;
-    const float frictionCoefficient = 0.3f;
+    constexpr float restitutionCoefficient = 0.2f;
 
     Vec2 collisionNormal = (posA - posB).UnitVector();
     Vec2 relativeVelocity = (velA - velB);
@@ -39,8 +34,8 @@ void CollisionResolver::ResolveKineticCollision(Particle *a, Particle *b) {
         Vec2 scaledNormalB = collisionNormal;
         scaledNormalB.Scale(impulseScalar * mbInverse);
 
-        a->velocity += scaledNormalA;
-        b->velocity -= scaledNormalB;
+        a.velocity += scaledNormalA;
+        b.velocity -= scaledNormalB;
 
         Vec2 normalVelocity = collisionNormal;
         normalVelocity.Scale(closingVelocity);
@@ -52,6 +47,7 @@ void CollisionResolver::ResolveKineticCollision(Particle *a, Particle *b) {
 
         // Static sliding
         if (tangentMagnitude > 0.0001f) {
+            constexpr float frictionCoefficient = 0.3f;
             tangent = tangent.UnitVector();
 
             float tangentVelocity = relativeVelocity.Dot(tangent);
@@ -70,25 +66,23 @@ void CollisionResolver::ResolveKineticCollision(Particle *a, Particle *b) {
             Vec2 frictionImpulseB = tangent;
             frictionImpulseB.Scale(frictionImpulseScalar * mbInverse);
 
-            a->velocity += frictionImpulseA;
-            b->velocity -= frictionImpulseB;
+            a.velocity += frictionImpulseA;
+            b.velocity -= frictionImpulseB;
         }
     }
 }
 
-#include <algorithm>
-
-bool CollisionResolver::applyPositionalCorrection(Particle *a, Particle *b) {
-    float maInverse = a->invMass;
-    float mbInverse = b->invMass;
+bool CollisionResolver::applyPositionalCorrection(Particle &a, Particle &b) {
+    float maInverse = a.invMass;
+    float mbInverse = b.invMass;
     float invMassSum = maInverse + mbInverse;
 
     if (invMassSum == 0.0f) return true;
 
-    Vec2 distanceVector = a->position - b->position;
+    Vec2 distanceVector = a.position - b.position;
     float distance = distanceVector.Magnitude();
 
-    float penetration = (a->radius + b->radius) - distance;
+    float penetration = (a.radius + b.radius) - distance;
     Vec2 normal;
 
     if (distance < 0.0001f) {
@@ -101,14 +95,14 @@ bool CollisionResolver::applyPositionalCorrection(Particle *a, Particle *b) {
 
     Vec2 correction = normal * (correctionScalar / invMassSum);
 
-    auto finalPositionA = a->position + correction * maInverse;
-    auto finalPositionB = b->position - correction * mbInverse;
+    auto finalPositionA = a.position + correction * maInverse;
+    auto finalPositionB = b.position - correction * mbInverse;
 
-    bool positionsChanged = (finalPositionA.Magnitude() - a->position.Magnitude() + finalPositionB.Magnitude() - b->
+    bool positionsChanged = (finalPositionA.Magnitude() - a.position.Magnitude() + finalPositionB.Magnitude() - b.
                              position.Magnitude()) > 1.0f;
 
-    a->UpdatePosition(finalPositionA);
-    b->UpdatePosition(finalPositionB);
+    a.UpdatePosition(finalPositionA);
+    b.UpdatePosition(finalPositionB);
 
     return positionsChanged;
 }

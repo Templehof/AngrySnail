@@ -10,12 +10,12 @@
 
 
 namespace Actions {
-    void pushAllLeft(std::vector<Particle *> &particles);
-    void pushAllRight(std::vector<Particle *> &particles);
-    void pushAllUp(std::vector<Particle *> &particles);
-    void pushAllDown(std::vector<Particle *> &particles);
-    void spawnParticle(std::vector<Particle *> &particles, float x, float y);
-    void shootParticle(std::vector<Particle *> &particles, float x, float y);
+    void pushAllLeft(std::vector<Particle> &particles);
+    void pushAllRight(std::vector<Particle> &particles);
+    void pushAllUp(std::vector<Particle> &particles);
+    void pushAllDown(std::vector<Particle> &particles);
+    void spawnParticle(std::vector<Particle> &particles, float x, float y);
+    void shootParticle(std::vector<Particle> &particles, float x, float y);
 }
 
 #endif //ANGRYSNAIL_ACTIONS_H

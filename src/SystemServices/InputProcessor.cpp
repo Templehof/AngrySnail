@@ -11,7 +11,7 @@
 #include "../Creator/Actions.h"
 #include "../Physics/Particle.h"
 
-void InputProcessor::processInput(std::vector<Particle *> &particles, const std::function<void()> &quitCallBack,
+void InputProcessor::processInput(std::vector<Particle> &particles, const std::function<void()> &quitCallBack,
                                   const SDL_Event &event) {
     switch (event.type) {
         case SDL_QUIT:

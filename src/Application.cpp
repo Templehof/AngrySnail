@@ -13,7 +13,7 @@ void Application::Quit() {
 
 void Application::Setup() {
     currentTime = SDL_GetTicks();
-    particles = std::vector<Particle *>();
+    particles.reserve(1000);
     running = Graphics::OpenWindow();
 }
 
@@ -37,25 +37,22 @@ void Application::ApplyForces() {
     EnvironmentalForces::applyDrag(particles);
 }
 
-void Application::ApplyIntegration(float deltaTime) const {
-    for (auto particle_: particles) {
-        particle_->Integrate(deltaTime);
+void Application::ApplyIntegration(float const deltaTime) {
+    for (auto &particle: particles) {
+        particle.Integrate(deltaTime);
     }
 }
 
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);
 
-    for (auto particle_: particles) {
-        Graphics::DrawFillCircle(particle_->position.x, particle_->position.y, particle_->radius, 0xFFFFFFFF);
+    for (auto &particle: particles) {
+        Graphics::DrawFillCircle(particle.position.x, particle.position.y, particle.radius, 0xFFFFFFFF);
     }
 
     Graphics::RenderFrame();
 }
 
-void Application::Destroy() const {
-    for (const auto &particle: particles) {
-        delete particle;
-    }
+void Application::Destroy() {
     Graphics::CloseWindow();
 }

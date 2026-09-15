@@ -8,9 +8,9 @@
 
 
 namespace CollisionResolver {
-    void ResolveKineticCollision(Particle *a, Particle *b);
+    void ResolveKineticCollision(Particle &a, Particle &b);
 
-    bool applyPositionalCorrection(Particle *a, Particle *b);
+    bool applyPositionalCorrection(Particle &a, Particle &b);
 };
 
 

@@ -1,6 +1,5 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
-#include <SDL_rect.h>
 #include <vector>
 
 #include "SystemServices/InputProcessor.h"
@@ -10,7 +9,7 @@ class Application {
 
 private:
     bool running = false;
-    std::vector<Particle *> particles;
+    std::vector<Particle> particles;
     Uint32 currentTime;
 
 public:
@@ -30,11 +29,11 @@ public:
 
     void ApplyPositionalCorrection() const;
 
-    void ApplyIntegration(float deltaTime) const;
+    void ApplyIntegration(float deltaTime);
 
     void Render();
 
-    void Destroy() const;
+    static void Destroy() ;
 };
 
 #endif

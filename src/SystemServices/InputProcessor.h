@@ -12,7 +12,8 @@
 
 
 namespace InputProcessor {
-    void processInput(std::vector<Particle *> &particles, const std::function<void()> &quitCallBack, const SDL_Event &event);
+    void processInput(std::vector<Particle> &particles, const std::function<void()> &quitCallBack,
+                      const SDL_Event &event);
 };
 
 
