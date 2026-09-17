@@ -1,4 +1,8 @@
 #include "Application.h"
+
+#include <iostream>
+#include <ostream>
+
 #include "Graphics.h"
 #include "Creator/EnvironmentalForces.h"
 #include "SystemServices/CollisionsObserver.h"
@@ -13,8 +17,19 @@ void Application::Quit() {
 
 void Application::Setup() {
     currentTime = SDL_GetTicks();
-    particles.reserve(1000);
+    particles.reserve(10000);
+    collisionPairs.reserve(10000);
     running = Graphics::OpenWindow();
+
+    float H = Graphics::Height();
+    float W = Graphics::Width();
+
+    boundaries = {
+        {Vec2(0, -1), -H}, // floor:   y = H, interior above
+        {Vec2(0, 1), 0}, // ceiling: y = 0, interior below
+        {Vec2(1, 0), 0}, // left:    x = 0, interior right
+        {Vec2(-1, 0), -W}, // right:   x = W, interior left
+    };
 }
 
 void Application::Input() {
@@ -26,9 +41,8 @@ void Application::Input() {
     }
 }
 
-void Application::ApplyPositionalCorrection() const {
-    CollisionsObserver::DetectCollisionsAndApplyPositionalCorrection(particles);
-    CollisionsObserver::ResolveBoundaryCollisions(particles, Graphics::windowWidth, Graphics::windowHeight);
+void Application::ApplyPositionalCorrection() {
+    CollisionsObserver::DetectCollisionsAndApplyPositionalCorrection(particles, collisionPairs, boundaries);
 }
 
 
@@ -38,6 +52,10 @@ void Application::ApplyForces() {
 }
 
 void Application::ApplyIntegration(float const deltaTime) {
+    if (!particles.empty()) {
+        auto vel = particles[0].velocity;
+        std::cout << vel.Magnitude() << std::endl;
+    }
     for (auto &particle: particles) {
         particle.Integrate(deltaTime);
     }

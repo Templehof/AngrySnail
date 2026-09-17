@@ -34,6 +34,7 @@ add_executable(AngrySnail src/main.cpp
         src/Physics/Material.cpp
         src/Physics/Material.h
         src/Physics/CollisionPair.h
+        src/Physics/Boundary.h
 )
 
 target_include_directories(AngrySnail PRIVATE ${SDL2_INCLUDE_DIRS})

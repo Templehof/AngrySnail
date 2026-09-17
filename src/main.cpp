@@ -9,28 +9,23 @@ int main() {
     Application app;
     app.Setup();
 
-
-    Uint32 currentTime = SDL_GetTicks();
+    constexpr float DT = 1000.0f / 60.0f;
+    constexpr Uint32 FRAME_MS = 1000 / 60;
 
     while (app.IsRunning()) {
-        Uint32 newTime = SDL_GetTicks();
         Uint32 frameStart = SDL_GetTicks();
         app.Input();
         app.ApplyForces();
-        app.ApplyIntegration(16.6);
+        app.ApplyIntegration(DT);
 
-        bool hasConverged = false;
-        while (!hasConverged) {
-            hasConverged = app.ApplyPositionalCorrection();
-            newTime = SDL_GetTicks();
-        }
+
+        app.ApplyPositionalCorrection();
 
         Uint32 elapsed = SDL_GetTicks() - frameStart;
-        if (elapsed < 16u)
-            SDL_Delay(16u - elapsed);
+        if (elapsed < FRAME_MS)
+            SDL_Delay(FRAME_MS - elapsed);
 
         app.Render();
-        currentTime = SDL_GetTicks();
     }
 
 
