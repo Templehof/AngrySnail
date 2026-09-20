@@ -86,7 +86,7 @@ Vec2 Force::GenerateFrictionForceHorizontal(const Particle &particle, const floa
 }
 
 Vec2 Force::GenerateGravity(const Particle &a) {
-    Vec2 gForce = Vec2(0, a.mass * GRAVITY_CONSTANT) * PIXELS_PER_METER;
+    Vec2 gForce = Vec2(0, a.mass * GRAVITY_CONSTANT);
     return gForce;
 }
 

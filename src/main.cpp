@@ -16,12 +16,18 @@ int main() {
         Uint32 frameStart = SDL_GetTicks();
         app.Input();
 
-        app.DetectCollisions();
-        app.ApplyContactVelocitiesResolution();
+
         app.ApplyForces();
+
+        app.DetectCollisions(false);
+        app.ApplyContactVelocitiesResolution();
+
         app.ApplyIntegration(DT);
 
-        app.DetectCollisions();
+        app.DetectCollisions(false);
+        app.ApplyContactVelocitiesResolution();
+
+        app.DetectCollisions(true);
         app.ApplyPositionalCorrection();
 
         Uint32 elapsed = SDL_GetTicks() - frameStart;

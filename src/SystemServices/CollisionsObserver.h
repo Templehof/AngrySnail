@@ -23,7 +23,7 @@ namespace CollisionsObserver {
 
     void BuildCollisionList(std::vector<Particle> &particles,
                             std::vector<CollisionPair> &collision_pairs,
-                            std::vector<Boundary> &boundaries);
+                            std::vector<Boundary> &boundaries, bool marginEnabled);
 }
 
 

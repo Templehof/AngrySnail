@@ -26,9 +26,8 @@ void Application::Setup() {
 
     boundaries = {
         {Vec2(0, -1), -H}, // floor
-        {Vec2(0, 1), 0}, // ceiling
-        // {Vec2(1, 0), 0}, // left
-        // {Vec2(-1, 0), -W}, // right
+        {Vec2(1, 0), 0}, // left
+        {Vec2(-1, 0), -W}, // right
     };
 }
 
@@ -41,8 +40,8 @@ void Application::Input() {
     }
 }
 
-void Application::DetectCollisions() {
-    CollisionsObserver::BuildCollisionList(particles, collisionPairs, boundaries);
+void Application::DetectCollisions(bool marginEnabled) {
+    CollisionsObserver::BuildCollisionList(particles, collisionPairs, boundaries, marginEnabled);
 }
 
 void Application::ApplyPositionalCorrection() {

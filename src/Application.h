@@ -28,7 +28,7 @@ public:
 
     void Input();
 
-    void DetectCollisions();
+    void DetectCollisions(bool marginEnabled);
 
     void ApplyForces();
 
