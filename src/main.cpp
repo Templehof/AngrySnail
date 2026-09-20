@@ -15,10 +15,13 @@ int main() {
     while (app.IsRunning()) {
         Uint32 frameStart = SDL_GetTicks();
         app.Input();
+
+        app.DetectCollisions();
+        app.ApplyContactVelocitiesResolution();
         app.ApplyForces();
         app.ApplyIntegration(DT);
 
-
+        app.DetectCollisions();
         app.ApplyPositionalCorrection();
 
         Uint32 elapsed = SDL_GetTicks() - frameStart;

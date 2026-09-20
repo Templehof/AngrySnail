@@ -71,38 +71,3 @@ void CollisionResolver::ResolveKineticCollision(Particle &a, Particle &b) {
         }
     }
 }
-
-bool CollisionResolver::applyPositionalCorrection(Particle &a, Particle &b) {
-    float maInverse = a.invMass;
-    float mbInverse = b.invMass;
-    float invMassSum = maInverse + mbInverse;
-
-    if (invMassSum == 0.0f) return true;
-
-    Vec2 distanceVector = a.position - b.position;
-    float distance = distanceVector.Magnitude();
-
-    float penetration = (a.radius + b.radius) - distance;
-    Vec2 normal;
-
-    if (distance < 0.0001f) {
-        normal = Vec2(0.0f, 1.0f);
-    } else {
-        normal = distanceVector * (1.0f / distance);
-    }
-
-    float correctionScalar = (penetration);
-
-    Vec2 correction = normal * (correctionScalar / invMassSum);
-
-    auto finalPositionA = a.position + correction * maInverse;
-    auto finalPositionB = b.position - correction * mbInverse;
-
-    bool positionsChanged = (finalPositionA.Magnitude() - a.position.Magnitude() + finalPositionB.Magnitude() - b.
-                             position.Magnitude()) > 1.0f;
-
-    a.UpdatePosition(finalPositionA);
-    b.UpdatePosition(finalPositionB);
-
-    return positionsChanged;
-}

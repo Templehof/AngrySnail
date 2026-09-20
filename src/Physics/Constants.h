@@ -15,6 +15,9 @@ constexpr Uint32 MILLISECONDS_PER_FRAME = 16u;
 
 constexpr float POS_CORR_SLOP = 0.0f;
 constexpr float POS_CORR_PERCENTAGE = 1.0f;
+constexpr float POS_MARGIN = 10;
+
 constexpr int POS_CORR_ITER = 100;
-constexpr float POS_MARGIN = 20;
+
+constexpr int REST_VELOCITY_RESOLUTION_ITER = 100;
 #endif //ANGRYSNAIL_CONSTANTS_H

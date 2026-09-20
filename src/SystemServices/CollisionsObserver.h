@@ -14,14 +14,16 @@
 namespace CollisionsObserver {
     void DetectCollisionsAndResolveKineticCollision(std::vector<Particle> &particles);
 
-    void DetectCollisionsAndApplyPositionalCorrection(std::vector<Particle> &particles,
-                                                      std::vector<CollisionPair> &collision_pairs,
-                                                      std::vector<Boundary> &boundaries);
+    void ApplyPositionalCorrection(std::vector<Particle> &particles,
+                                   std::vector<CollisionPair> &collision_pairs);
 
     void CorrectPositions(std::vector<Particle> &particles, CollisionPair &cp, float &maxErr);
 
-    void BuildCollisionList(Particle &a, int aIndex, Particle &b, int bIndex,
-                            std::vector<CollisionPair> &overlappedParticles);
+    void ResolveContactVelocities(std::vector<Particle> &particles, const std::vector<CollisionPair> &collision_pairs);
+
+    void BuildCollisionList(std::vector<Particle> &particles,
+                            std::vector<CollisionPair> &collision_pairs,
+                            std::vector<Boundary> &boundaries);
 }
 
 

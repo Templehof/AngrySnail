@@ -37,7 +37,9 @@ void Actions::spawnParticle(std::vector<Particle> &particles, float x, float y) 
 }
 
 void Actions::shootParticle(std::vector<Particle> &particles, float x, float y) {
-    Particle tempParticle(x, y, 10, 10);
-    tempParticle.velocity.Add(Vec2(0, 0));
-    particles.emplace_back(tempParticle);
+    for (int i = 0; i < 100; ++i) {
+        Particle tempParticle(x + i*2, y + i*2, 100, 10);
+        tempParticle.velocity.Add(Vec2(0, 0));
+        particles.emplace_back(tempParticle);
+    }
 }

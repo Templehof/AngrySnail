@@ -9,7 +9,6 @@
 
 #include "../Physics/Boundary.h"
 #include "../Physics/CollisionPair.h"
-#include "../Physics/CollisionResolver.h"
 #include "../Physics/Constants.h"
 #include "../Physics/Force.h"
 
@@ -27,26 +26,8 @@ void CollisionsObserver::DetectCollisionsAndResolveKineticCollision(std::vector<
     // }
 }
 
-void CollisionsObserver::DetectCollisionsAndApplyPositionalCorrection(std::vector<Particle> &particles,
-                                                                      std::vector<CollisionPair> &collision_pairs,
-                                                                      std::vector<Boundary> &boundaries) {
-    collision_pairs.clear();
-    if (particles.empty()) {
-        return;
-    }
-
-    for (int i = 0; i < particles.size() - 1; i++) {
-        for (int j = i + 1; j < particles.size(); j++) {
-            BuildCollisionList(particles[i], i, particles[j], j, collision_pairs);
-        }
-    }
-
-    for (int i = 0; i < particles.size(); i++)
-        for (auto &b: boundaries)
-            if (b.depth(particles[i]) > -POS_MARGIN)
-                collision_pairs.push_back({i, -1, b.normal, b.c});
-
-
+void CollisionsObserver::ApplyPositionalCorrection(std::vector<Particle> &particles,
+                                                   std::vector<CollisionPair> &collision_pairs) {
     int iter = 0;
     float maxErr;
     do {
@@ -56,16 +37,37 @@ void CollisionsObserver::DetectCollisionsAndApplyPositionalCorrection(std::vecto
     } while (maxErr > POS_CORR_SLOP && ++iter < POS_CORR_ITER);
 }
 
-void CollisionsObserver::BuildCollisionList(Particle &a, int aIndex, Particle &b, int bIndex,
-                                            std::vector<CollisionPair> &overlappedParticles) {
-    float distanceSquared = (a.position - b.position).Magnitude();
+void CollisionsObserver::BuildCollisionList(std::vector<Particle> &particles,
+                                            std::vector<CollisionPair> &collision_pairs,
+                                            std::vector<Boundary> &boundaries) {
+    collision_pairs.clear();
+    if (particles.empty()) {
+        return;
+    }
 
-    float overlap = (a.radius + b.radius) - distanceSquared + POS_MARGIN;
+    for (int i = 0; i < particles.size() - 1; i++) {
+        for (int j = i + 1; j < particles.size(); j++) {
+            Particle &a = particles[i];
+            Particle &b = particles[j];
+            float distanceSquared = (a.position - b.position).Magnitude();
+            float overlap = (a.radius + b.radius) - distanceSquared + POS_MARGIN;
 
-    if (overlap >= POS_CORR_SLOP) {
-        overlappedParticles.push_back(CollisionPair(aIndex, bIndex));
+            if (overlap > POS_CORR_SLOP) {
+                collision_pairs.push_back(CollisionPair(i, j));
+            }
+        }
+    }
+
+    for (int i = 0; i < particles.size(); i++) {
+        for (auto &b: boundaries) {
+            float penDept = b.depth(particles[i]);
+            if (penDept < -POS_CORR_SLOP) {
+                collision_pairs.push_back({i, -1, b.normal, b.c});
+            }
+        }
     }
 }
+
 
 void CollisionsObserver::
 CorrectPositions(std::vector<Particle> &particles, CollisionPair &cp, float &maxErr) {
@@ -90,7 +92,6 @@ CorrectPositions(std::vector<Particle> &particles, CollisionPair &cp, float &max
         }
 
         float corr = (penDepth - POS_CORR_SLOP) * POS_CORR_PERCENTAGE;
-
         float wa = A.invMass, wb = B.invMass;
         float wsum = wa + wb;
 
@@ -98,21 +99,48 @@ CorrectPositions(std::vector<Particle> &particles, CollisionPair &cp, float &max
 
         A.position -= contactNormal * corr * (wa / wsum);
         B.position += contactNormal * corr * (wb / wsum);
-
-        // Vec2 approachingVelocity = Vec2(0, 0);
-        // A.velocity = approachingVelocity;
-        // B.velocity = approachingVelocity;
         maxErr = std::max(maxErr, corr);
-
     } else {
         float depth = A.radius - (A.position.Dot(cp.planeNormal) - cp.planeC);
         if (depth <= POS_CORR_SLOP) return;
-
         float corr = (depth - POS_CORR_SLOP) * POS_CORR_PERCENTAGE;
         A.position += cp.planeNormal * corr;
-
-        // Vec2 approachingVelocity = A.velocity;
-        // A.velocity -= approachingVelocity;
         maxErr = std::max(maxErr, corr);
+    }
+}
+
+void CollisionsObserver::ResolveContactVelocities(std::vector<Particle> &particles,
+                                                  const std::vector<CollisionPair> &collision_pairs) {
+    for (int i = 0; i < REST_VELOCITY_RESOLUTION_ITER; ++i) {
+        for (auto &cp: collision_pairs) {
+            if (cp.bIndex != -1) {
+                Particle &a = particles[cp.aIndex];
+                Particle &b = particles[cp.bIndex];
+
+                Vec2 velocityDelta = a.velocity - b.velocity;
+                Vec2 contactNormal = velocityDelta.UnitVector();
+
+                float wsum = a.invMass + b.invMass;
+                float closingVelocity = velocityDelta.Dot(contactNormal);
+
+                if (closingVelocity < 0) {
+                    continue;
+                }
+
+                float J = -closingVelocity / wsum;
+                a.velocity += contactNormal * (J * a.invMass);
+                b.velocity -= contactNormal * (J * b.invMass);
+            } else {
+                Particle &a = particles[cp.aIndex];
+                float closingVelocity = a.velocity.Dot(cp.planeNormal);
+
+                if (closingVelocity > 0) {
+                    continue;
+                }
+
+                Vec2 closingVelocityVector = cp.planeNormal * closingVelocity;
+                a.velocity -= closingVelocityVector;
+            }
+        }
     }
 }

@@ -28,9 +28,13 @@ public:
 
     void Input();
 
+    void DetectCollisions();
+
     void ApplyForces();
 
     void ApplyPositionalCorrection();
+
+    void ApplyContactVelocitiesResolution();
 
     void ApplyIntegration(float deltaTime);
 
