@@ -15,10 +15,8 @@ void EnvironmentalForces::applyGravity(std::vector<Particle> &particles) {
 
 void EnvironmentalForces::applyDrag(std::vector<Particle> &particles) {
     for (auto &p: particles) {
-        float speed = p.velocity.Magnitude();
-        Vec2 dragForce;
-        dragForce = p.velocity * (-0.1f * speed);
-        auto dragAcceleration = dragForce / p.mass;
+        Vec2 dragForce = p.velocity * (-0.2f * p.velocity.Magnitude());
+        auto dragAcceleration = dragForce * p.invMass;
         p.AddForce(dragAcceleration);
     }
 }

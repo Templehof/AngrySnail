@@ -1,11 +1,10 @@
 #include "Application.h"
-
-#include <iostream>
-#include <ostream>
-
 #include "Graphics.h"
 #include "Creator/EnvironmentalForces.h"
 #include "SystemServices/CollisionsObserver.h"
+#include <chrono>
+
+#include "SystemServices/InputProcessor.h"
 
 bool Application::IsRunning() const {
     return running;
@@ -17,9 +16,10 @@ void Application::Quit() {
 
 void Application::Setup() {
     currentTime = SDL_GetTicks();
-    particles.reserve(10000);
+    particles.reserve(100000);
     collisionPairs.reserve(10000);
     running = Graphics::OpenWindow();
+    texture = Graphics::CreateCircleTexture(10);
 
     float H = Graphics::Height();
     float W = Graphics::Width();
@@ -58,17 +58,36 @@ void Application::ApplyForces() {
     EnvironmentalForces::applyDrag(particles);
 }
 
-void Application::ApplyIntegration(float const deltaTime) {
+void Application::ApplyVelocityIntegration(float const deltaTime) {
     for (auto &particle: particles) {
-        particle.Integrate(deltaTime);
+        particle.IntegrateVelocity(deltaTime);
+    }
+}
+
+void Application::ApplyPositionIntegration(float deltaTime) {
+    for (auto &particle: particles) {
+        particle.IntegratePosition(deltaTime);
     }
 }
 
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);
 
+    // if (!particles.empty()) {
+    //     for (int i = 0; i < particles.size(); ++i) {
+    //         std::cout << particles[i].velocity.y << std::endl;
+    //     }
+    // }
+
+
     for (auto &particle: particles) {
-        Graphics::DrawFillCircle(particle.position.x, particle.position.y, particle.radius, 0xFFFFFFFF);
+        SDL_FRect dst = {
+            particle.position.x - particle.radius,
+            particle.position.y - particle.radius,
+            particle.radius * 2.0f,
+            particle.radius * 2.0f
+        };
+        SDL_RenderCopyF(Graphics::renderer, texture, nullptr, &dst);
     }
 
     Graphics::RenderFrame();

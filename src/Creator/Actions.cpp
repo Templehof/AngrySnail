@@ -5,28 +5,28 @@
 #include "Actions.h"
 
 void Actions::pushAllLeft(std::vector<Particle> &particles) {
-    Vec2 leftPush = Vec2(-1000, 0);
+    Vec2 leftPush = Vec2(-10000, 0);
     for (auto &p: particles) {
         p.AddForce(leftPush);
     }
 }
 
 void Actions::pushAllRight(std::vector<Particle> &particles) {
-    Vec2 rightPush = Vec2(10000, 0);
+    Vec2 rightPush = Vec2(100000, 0);
     for (auto &p: particles) {
         p.AddForce(rightPush);
     }
 }
 
 void Actions::pushAllUp(std::vector<Particle> &particles) {
-    Vec2 upPush = Vec2(0, 1000);
+    Vec2 upPush = Vec2(0, 10000);
     for (auto &p: particles) {
         p.AddForce(upPush);
     }
 }
 
 void Actions::pushAllDown(std::vector<Particle> &particles) {
-    Vec2 downPush = Vec2(0, 1000);
+    Vec2 downPush = Vec2(0, 10000);
     for (auto &p: particles) {
         p.AddForce(downPush);
     }
@@ -37,9 +37,8 @@ void Actions::spawnParticle(std::vector<Particle> &particles, float x, float y) 
 }
 
 void Actions::shootParticle(std::vector<Particle> &particles, float x, float y) {
-    // particles.emplace_back(x, y, 10, 10);
-    for (int i = 0; i < 20; ++i) {
-        Particle tempParticle(x + i*2, y, 10, 5);
+    for (int i = 0; i < 1; ++i) {
+        Particle tempParticle(x + i * 10, y, 10, 20);
         tempParticle.velocity.Add(Vec2(0, 0));
         particles.emplace_back(tempParticle);
     }

@@ -22,13 +22,12 @@ struct Particle {
 
     ~Particle();
 
-    void Integrate(float dt);
+    void IntegrateVelocity(float dt);
+    void IntegratePosition(float dt);
 
     void AddForce(const Vec2 &force);
 
     void ClearForces();
-
-    void UpdatePosition(const Vec2 &newPosition);
 };
 
 #endif //ANGRYSNAIL_PARTICLE_H

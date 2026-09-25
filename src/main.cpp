@@ -3,7 +3,6 @@
 #include <SDL_timer.h>
 
 #include "Application.h"
-#include "Physics/Constants.h"
 
 int main() {
     Application app;
@@ -16,25 +15,31 @@ int main() {
         Uint32 frameStart = SDL_GetTicks();
         app.Input();
 
+        auto start_time = std::chrono::high_resolution_clock::now();
 
         app.ApplyForces();
-
         app.DetectCollisions(false);
+        app.ApplyVelocityIntegration(DT);
         app.ApplyContactVelocitiesResolution();
 
-        app.ApplyIntegration(DT);
-
-        app.DetectCollisions(false);
-        app.ApplyContactVelocitiesResolution();
+        app.ApplyPositionIntegration(DT);
 
         app.DetectCollisions(true);
         app.ApplyPositionalCorrection();
+
+        auto end_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> calculation_time = end_time - start_time;
+        std::cout << "Physics calculations took: " << calculation_time.count() << " ms\n";
 
         Uint32 elapsed = SDL_GetTicks() - frameStart;
         if (elapsed < FRAME_MS)
             SDL_Delay(FRAME_MS - elapsed);
 
+        auto start_render_time = std::chrono::high_resolution_clock::now();
         app.Render();
+        auto end_render_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> calculation_render_time = end_render_time - start_render_time;
+        std::cout << "Render calculations took: " << calculation_render_time.count() << " ms\n";
     }
 
 

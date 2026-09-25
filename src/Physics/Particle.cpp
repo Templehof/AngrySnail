@@ -6,7 +6,6 @@
 
 Particle::Particle(float x, float y, float mass, float radius) {
     this->position = Vec2(x, y);
-    this->prevPosition = Vec2(x, y);
     this->mass = mass;
     if (mass != 0.0) {
         this->invMass = 1.0f / mass;
@@ -20,10 +19,6 @@ Particle::Particle(float x, float y, float mass, float radius) {
 Particle::~Particle() {
 }
 
-void Particle::UpdatePosition(const Vec2 &newPosition) {
-    this->position = newPosition;
-}
-
 void Particle::AddForce(const Vec2 &force) {
     sumForces += force;
 }
@@ -32,10 +27,20 @@ void Particle::ClearForces() {
     sumForces = Vec2(0.0, 0.0);
 }
 
-void Particle::Integrate(const float dtMillis) {
+void Particle::IntegrateVelocity(const float dtMillis) {
     float dtSeconds = dtMillis / 1000.0f;
     acceleration = sumForces * invMass;
     velocity += acceleration * dtSeconds;
-    UpdatePosition(position + velocity * dtSeconds);
     ClearForces();
+}
+
+void Particle::IntegratePosition(const float dtMillis) {
+    float dtSeconds = dtMillis / 1000.0f;
+    if (velocity.SquaredMagnitude() > 100) {
+        position += velocity * dtSeconds;
+    }
+
+    if (velocity.SquaredMagnitude() < 100) {
+        velocity = Vec2(0, 0);
+    }
 }

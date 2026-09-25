@@ -2,9 +2,9 @@
 #define APPLICATION_H
 #include <vector>
 
+#include "Graphics.h"
 #include "Physics/Boundary.h"
 #include "Physics/CollisionPair.h"
-#include "SystemServices/InputProcessor.h"
 #include "Physics/Particle.h"
 
 class Application {
@@ -14,6 +14,7 @@ private:
     std::vector<CollisionPair> collisionPairs;
     std::vector<Boundary> boundaries;
     Uint32 currentTime;
+    SDL_Texture* texture;
 
 public:
     Application() = default;
@@ -36,7 +37,8 @@ public:
 
     void ApplyContactVelocitiesResolution();
 
-    void ApplyIntegration(float deltaTime);
+    void ApplyVelocityIntegration(float deltaTime);
+    void ApplyPositionIntegration(float deltaTime);
 
     void Render();
 
